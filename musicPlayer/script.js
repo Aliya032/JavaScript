@@ -78,19 +78,80 @@ const allSongs = [
     },
   ];
 
+// new variable audio
 const audio = new Audio();
 
+//userData object that stores: songs, currentSong, songCurrentTime
 let userData = {
     songs: [...allSongs],
     currentSong: null, 
     songCurrentTime: 0,
 };
 
+//this function helps to play the song using its id
+const playSong = (id) => {
+  const song = userData?.songs.find((song) => song.id === id);
+  audio.src = song.src;
+  audio.title = song.title;
+
+  if (userData?.currentSong === null || userData.currentSong.id != song.id) {
+    audio.currentTime = 0;
+  } else {
+    audio.currentTime = userData?.songCurrentTime;
+  }
+  userData.currentSong = song;
+  playButton.classList.add("playing");
+
+  highlightCurrentSong();
+  audio.play();
+};
+
+//pausing the song function 
+const pauseSong = () => {
+  userData.songCurrentTime = audio.currentTime; //we are not using optional chaining here becuase userData.songCurrentTime will not be null or undefined at this point 
+  playButton.classList.remove("playing");
+  audio.pause();
+};
+
+//playing next song
+const playNextSong = () => {
+  if (userData?.currentSong === null) {
+    playSong(userData?.songs[0].id);
+  } else {
+    const currentSongIndex = getCurrentSongIndex();
+    const nextSong = userData?.songs[currentSongIndex + 1];
+    playSong(nextSong.id);
+  }
+};
+
+//previous song 
+const playPreviousSong = () => {
+  if (userData?.currentSong === null) return ;
+  else {
+    const currentSongIndex = getCurrentSongIndex();
+    const previousSong = userData?.songs[currentSongIndex - 1];
+    playSong(previousSong.id);
+  }
+}
+
+//highlighting the current song 
+const highlightCurrentSong = () => {
+  const playlistSongElements = document.querySelectorAll(".playlist-song");
+  const songToHighlight = document.getElementById(`song-${userData?.currentSong?.id}`);
+
+  playlistSongElements.forEach((songEl) => {
+    songEl.removeAttribute("aria-current");
+  });
+
+  if (songToHighlight) songToHighlight.setAttribute("aria-current", "true");
+};
+
 //we're building a function called renderSongs which is an arrow function that takes an array as an parameter 
+// it helps to render the songs or display the below playlist 
 const renderSongs = (array) => {
     const songsHTML = array.map((song) => {
         return `<li id="song-${song.id}" class="playlist-song">
-        <button class="playlist-song-info">
+        <button class="playlist-song-info" onclick="playSong(${song.id})">
             <span class="playlist-song-title">${song.title}</span>  
             <span class="playlist-song-artist">${song.artist}</span>
             <span class="playlist-song-duration">${song.duration}</span>  
@@ -102,6 +163,28 @@ const renderSongs = (array) => {
     playlistSongs.innerHTML = songsHTML;
 };
 
+//getting the index of the current playing song 
+const getCurrentSongIndex = () => userData?.songs.indexOf(userData?.currentSong);
+
+//playing the song 
+playButton.addEventListener("click", () => {
+  if (userData?.currentSong === null) {
+    playSong(userData?.songs[0].id);
+  } else {
+    playSong(userData?.currentSong.id);
+  }
+})
+
+//pausing the song - adding event to the pause button 
+pauseButton.addEventListener("click", pauseSong);
+
+//play next button - adding event to the play button 
+nextButton.addEventListener("click", playNextSong);
+
+//play previous button - adding event to the previous button 
+previousButton.addEventListener("click", playPreviousSong);
+
+//this function helps to arrange the songs in alphabetical manner
 const sortSongs = () => {
   userData?.songs.sort((a,b) => {
     if (a.title < b.title) {

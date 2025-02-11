@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1 class="userName"></h1>
+    <h2 class="userAge"></h2>
+    <input type="text" placeholder="Enter name here" class="name">
+    <button class="saveNameBtn">Save Name</button>
+    <br>
+    <input type="text" placeholder="Enter age here" class="age">
+    <button class="saveAgeBtn">Save Age</button>
+</body>
+<script>
+    const userNameText = document.querySelector(".userName");
+    const userAgeText =document.querySelector(".userAge")
+    const saveNameButton = document.querySelector(".saveNameBtn")
+    const saveAgeButton = document.querySelector(".saveAgeBtn")
+
+    //EXAMPLE FOR LOCAL STORAGE
+    saveNameButton.addEventListener("click", () => {
+        const userName = document.querySelector(".name").value;
+        userNameText.textContent = userName;
+        localStorage.setItem("name", userName); // First, we get the value of the name input, set it as the textContent of userNameText. And then use the setItem() of local storage to save the userName value in local storage.
+    })
+
+    function displayUserName() {
+            const nameFromLocalStorage = localStorage.getItem("name");
+            if (nameFromLocalStorage) {
+                userNameText.textContent = nameFromLocalStorage
+            } else {
+                userNameText.textContent = "No name data in local storage"
+            }
+        }
+
+    displayUserName()
+    // First, we get the value of the name input, set it as the textContent of userNameText. And then use the setItem() of local storage to save the userName value in local storage.
+    // The displayUserName function gets nameFromLocalStorage using the getItem() method. If the value exists in local storage, we set it as the textContent of the userNameText element. If it's null or doesn't exist, then we set textContent to the string "No name data in local storage".
+    
+    //EXAMPLE FOR SESSION STORAGE
+    saveAgeButton.addEventListener("click", () => {
+        const userAge = document.querySelector('.age').value
+        userAgeText.textContent = userAge;
+        sessionStorage.setItem("age", userAge)
+    })
+
+    function displayUserAge() {
+        const ageFromSessionStorage = sessionStorage.getItem("age")
+
+        if (ageFromSessionStorage) {
+            userAgeText.textContent = ageFromSessionStorage
+        } else {
+            userAgeText.textContent = "No age data in session storage"
+        }
+    }
+
+    displayUserAge()
+
+    //when you close and reopen the page, the name data from local storage persists. but the age data from session storage is cleared once the page closes. 
+        </script>
+</html>
